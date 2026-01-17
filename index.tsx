@@ -1,6 +1,6 @@
 
 import React, { useState, useRef, useEffect, forwardRef } from 'react';
-import ReactDOM from 'react-dom/client';
+import { createRoot } from 'react-dom/client';
 
 /**
  * 1. TYPES
@@ -396,10 +396,11 @@ const App: React.FC = () => {
   };
 
   const exportPdf = async () => {
-    if (!canvasRef.current || typeof (window as any).jspdf === 'undefined') return;
+    const win = window as any;
+    if (!canvasRef.current || !win.jspdf) return;
     setIsExporting(true);
     try {
-      const { jsPDF } = (window as any).jspdf;
+      const { jsPDF } = win.jspdf;
       const doc = new jsPDF({ orientation: settings.orientation.toLowerCase(), unit: 'mm', format: settings.pageSize === PageSize.CUSTOM ? [settings.customWidth, settings.customHeight] : settings.pageSize.toLowerCase() });
       doc.addImage(canvasRef.current.toDataURL('image/jpeg', 0.95), 'JPEG', 0, 0, doc.internal.pageSize.getWidth(), doc.internal.pageSize.getHeight());
       doc.save(`fused-${Date.now()}.pdf`);
@@ -450,5 +451,5 @@ const App: React.FC = () => {
   );
 };
 
-const root = ReactDOM.createRoot(document.getElementById('root')!);
+const root = createRoot(document.getElementById('root')!);
 root.render(<React.StrictMode><App /></React.StrictMode>);
